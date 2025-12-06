@@ -1,0 +1,11 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ComparePageWithProvider from '../components/compare/ComparePageWithProvider.tsx';
+---
+
+<BaseLayout
+  title="So Sánh Xe | soosanmotor.com"
+  description="So sánh các dòng xe tải, cẩu, mooc, đầu kéo để chọn sản phẩm phù hợp nhất với nhu cầu của bạn."
+>
+  <ComparePageWithProvider client:idle />
+</BaseLayout>

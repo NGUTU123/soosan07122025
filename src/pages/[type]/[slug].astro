@@ -1,0 +1,51 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ProductDetailWithProvider from '../../components/TruckDetail/ProductDetailWithProvider.tsx';
+import { getVisibleProducts, getCategoryById, getVisibleBlogPosts } from '../../utils/contentCollections';
+
+export async function getStaticPaths() {
+  const trucks = await getVisibleProducts();
+
+  return trucks.map((truck) => ({
+    params: {
+      type: truck.type,
+      slug: truck.slug
+    },
+    props: { truck },
+  }));
+}
+
+const { truck } = Astro.props;
+const { type } = Astro.params;
+
+if (!truck || truck.type !== type) {
+  return Astro.redirect('/404');
+}
+
+const allTrucks = await getVisibleProducts();
+const relatedTrucks = allTrucks
+  .filter(t =>
+    (t.brand === truck.brand ||
+     Math.abs(t.weight - truck.weight) < 2) &&
+    t.id !== truck.id
+  )
+  .slice(0, 4);
+
+const category = await getCategoryById(truck.type);
+const categoryName = category?.data.name || truck.type;
+
+// Get all blog posts for related posts calculation
+const allBlogPosts = await getVisibleBlogPosts();
+---
+
+<BaseLayout
+  title={`${truck.name} - ${categoryName} | soosanmotor.com`}
+  description={truck.description}
+>
+  <ProductDetailWithProvider
+    client:idle
+    truck={truck}
+    relatedTrucks={relatedTrucks}
+    allBlogPosts={allBlogPosts}
+  />
+</BaseLayout>
